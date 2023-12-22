@@ -131,19 +131,12 @@
 
 <div class="m-4" id="viewBudget">
 	<h4 class="text-center">
-      Budget
+      Budget 
+      <button id="openBudget" type="button" class="btn btn-primary btn-sm">&#8595;</button>
+      <button id="closeBudget" type="button" class="btn btn-primary btn-sm d-none">&#8593;</button>
     </h4>
-  <div class="row">
-    <div class="col-1">
-      🛒
-    </div>
-    <div class="col-11">
-      	<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-  			<div class="progress-bar bg-success" style="width: 25%">$100/$200</div>
-		</div>
-    </div>
-  </div>
-  
+    <div id="viewBudgetSummary"></div>
+    <div id="viewBudgetListing" class="d-none"></div>
 </div>
 
 
@@ -331,10 +324,20 @@ $("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.
 		buildTransactionsView();
 
 
+		const parseBudgetItem = () => {
+			return {
+					start: moment(entry[0], "MM/DD/YYYY"),
+					end: moment(entry[1], "MM/DD/YYYY"),
+					category: entry[2],
+					limit: limit.toFixed(2),
+					current: current.toFixed(2),
+					percent: (current / limit) * 100,
+			};
+		}
 
 		const buildBudgetsView = () => {
-			$("#viewBudget").empty();
-			$("#viewBudget").append(`<h4 class="text-center">Budget</h4>`);
+			$("#viewBudgetSummary").empty();
+			$("#viewBudgetListing").empty();
 			const transactionsForBudget = transactions.map(row => { 
 				const entry = row.split(',');
 				return {
@@ -366,8 +369,8 @@ $("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.
 			const grandPercent = (grandCurrent / grandLimit) * 100;
 
 			$.each(enteries, function(index, entry) {
-					$("#viewBudget").append(`
-						  <div class="row d-none">
+					$("#viewBudgetListing").append(`
+						  <div class="row">
 						    <div class="col-1">${icons[entry.category]}</div>
 						    <div class="col-11">
 						      	<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
@@ -377,7 +380,7 @@ $("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.
 						  </div>
 						`);
 			});
-			$("#viewBudget").append(`
+			$("#viewBudgetSummary").append(`
 				  <div class="row summary">
 				    <div class="col-1">💰</div>
 				    <div class="col-11">
@@ -419,6 +422,18 @@ $("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.
 			$("#viewEdit").addClass('d-none');
 			$("#viewBudget").removeClass('d-none');
 			$("#viewTransactions").removeClass('d-none');
+	});
+	$("#openBudget").click(function() {
+			$("#openBudget").addClass('d-none');
+			$("#closeBudget").removeClass('d-none');
+			$("#viewBudgetSummary").addClass('d-none');
+			$("#viewBudgetListing").removeClass('d-none');
+	});
+	$("#closeBudget").click(function() {
+			$("#closeBudget").addClass('d-none');
+			$("#openBudget").removeClass('d-none');
+			$("#viewBudgetListing").addClass('d-none');
+			$("#viewBudgetSummary").removeClass('d-none');
 	});
 
     });
