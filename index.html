@@ -29,6 +29,9 @@
   </div>
 </nav>	
 
+<!-- // Errors -->
+<div class="alert alert-danger d-none" role="alert" id="errorMessage"></div>
+
 
 <!-- // Start import/export form -->
 <div class="container-fluid">
@@ -183,12 +186,7 @@
 
     $( document ).ready(function() {
     	// Load the cookie data
-
-
-    	if (Cookies.get('categories') == null) {
-
-		
-
+    	if (!Cookies.get('categories')) {
 			console.error('Setting categories default cookie');
 			Cookies.set('categories', categories, { path: '' });
     	}
@@ -204,12 +202,16 @@
 			console.error('Setting transactions default cookie');
 			Cookies.set('transactions', transactions);
     	}
-
-
-
-    	
-
-
+		// If you can't access any cookies
+		if (!Cookies.get('categories') && Cookies.get('sources') && Cookies.get('transactions')) {
+			$("#errorMessage").removeClass('d-none').text('Unable to read/save cookies.');
+		} else {
+			categories = !Cookies.get('categories');
+			sources = !Cookies.get('sources');
+			budget = !Cookies.get('budget');
+			transactions = !Cookies.get('transactions');
+		}
+		
 
     	// Set the edit form options
 	var categorySelect = $("#categorySelect");
