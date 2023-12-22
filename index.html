@@ -57,7 +57,7 @@
 </div>
 <div class="row">
 <div class="mt-2 col-6">
-  	<button type="submit" class="btn btn-primary mt-2">Save</button>
+  	<button id="import" type="button" class="btn btn-primary mt-2">Import</button>
 </div>
 <div class="mt-2 col-6 align-right">
 	<button type="button" class="btn btn-danger mt-2" id="resetCookies">Reset</button>
@@ -187,8 +187,25 @@
 	var budget = [];
 	var transactions = ['12/1/23,Noodles & Co ,-$11.84,Resturants,apple,1'];
 
+	const populateExport = () => {
+			$("#categoryData").val(JSON.stringify(categories));
+			$("#sourceData").val(JSON.stringify(sources));
+			$("#budgetData").val(JSON.stringify(budget));
+			$("#transactionData").val(JSON.stringify(transactions));
+	};
+	$("#import").click(function() {
+			categories = JSON.parse($("#categoryData").val());
+			sources = JSON.parse($("#sourceData").val());
+			budget = JSON.parse($("#budgetData").val());
+			transactions = JSON.parse($("#transactionData").val());
+			Cookies.set('categories', JSON.stringify(categories));
+			Cookies.set('sources', JSON.stringify(sources));
+			Cookies.set('budget', JSON.stringify(budget));
+			Cookies.set('transactions', JSON.stringify(transactions));
+			$("#import").addClass("disabled");
+	});
+
 	$("#resetCookies").click(function() {
-		alert('ok');
 		Cookies.remove('categories');
 		Cookies.remove('sources');
 		Cookies.remove('budget');
@@ -227,6 +244,7 @@
 			console.error('Decode budget', budget);
 			console.error('Decode transactions', transactions);
 		}
+		populateExport();
 		
 
     	// Set the edit form options
