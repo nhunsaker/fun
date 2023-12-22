@@ -187,35 +187,50 @@
 
 <script>
 	// Defaults
-	var categories = ['groceries', 'clothing', 'resturants', 'gas', 'other', 'vacation'];
+	var icons = {
+		groceries: '🛒',
+		amazon: '📦',
+		clothing: '👕',
+		resturants: '🍽️',
+		gas: '🚗',
+		other: '❓',
+		vacation: '🏖️',
+		gifts: '🎁',
+		cash: '💸',
+		amex: '🇺🇸',
+		apple: '🍎',
+		etrade: '🏦',
+		chase: '💳'
+	};
+	var categories = ['groceries', 'amazon', 'clothing', 'resturants', 'gas', 'other', 'vacation', 'gifts'];
 	var sources = ['cash', 'amex', 'apple', 'etrade', 'chase'];
 	var budget = [];
 	var transactions = [
-'12/1/23,Noodles & Co ,-$11.84,Resturants,apple,1',
-'12/2/23,Tim Tom,-$2.00,Groceries,apple,1',
-'12/2/23,Holister,-$50.00,Gifts,apple,1',
-'12/2/23,Caribu,-$18.93,Resturants,apple,1',
-'12/2/23,Reuse Center,-$6.00,Other,apple,1',
-'12/3/23,Target,-$96.00,Groceries,amex,1',
-'12/3/23,Moscow on the Hill,-$65.66,Resturants,amex,1',
-'12/7/2023,Domain Transfer,-$21.00,Other,amex,1',
-'12/8/2023,Whole Foods via Amazon,-$105.00,Groceries,amex,1',
-'12/8/2023,Whole Foods for Meats,-$60.00,Groceries,amex,1',
-'12/9/2023,Venmo ,-$25.00,Other,debit,1',
-'12/9/2023,Film via Amazon,-$44.00,Other,amex,1',
-'12/9/2023,Adobe,$0.00,Other,amex,1',
-'12/11/2023,Target,-$21.00,Groceries,apple,1',
-'12/14/2023,Target,-$5.00,Groceries,amex,1',
-'12/14/2023,Target,-$35.83,Groceries,apple,1',
-'12/15/2023,Amazon,$0.00,Amazon,amex,1',
-'12/15/2023,Herbst,-$43.89,Gifts,apple,1',
-'12/15/2023,Dogwood,-$55.00,Gifts,apple,1',
-'12/15/2023,Target,-$70.12,Groceries,apple,1',
-'12/15/2023,Target,-$4.41,Groceries,apple,1',
-'12/16/2023,Mpls Parking,-$1.25,Other,apple,1',
-'12/16/2023,Cardigan Donuts,-$25.00,Resturants,apple,1',
-'12/18/2023,Amazon,-$18.34,Amazon,amex,1',
-'12/21/2023,Gas,-$36.24,Gas,apple,1'
+'12/1/23,Noodles & Co ,-$11.84,resturants,apple,1',
+'12/2/23,Tim Tom,-$2.00,groceries,apple,1',
+'12/2/23,Holister,-$50.00,gifts,apple,1',
+'12/2/23,Caribu,-$18.93,resturants,apple,1',
+'12/2/23,Reuse Center,-$6.00,other,apple,1',
+'12/3/23,Target,-$96.00,groceries,amex,1',
+'12/3/23,Moscow on the Hill,-$65.66,resturants,amex,1',
+'12/7/2023,Domain Transfer,-$21.00,other,amex,1',
+'12/8/2023,Whole Foods via Amazon,-$105.00,groceries,amex,1',
+'12/8/2023,Whole Foods for Meats,-$60.00,groceries,amex,1',
+'12/9/2023,Venmo ,-$25.00,other,etrade,1',
+'12/9/2023,Film via Amazon,-$44.00,other,amex,1',
+'12/9/2023,Adobe,$0.00,other,amex,1',
+'12/11/2023,Target,-$21.00,groceries,apple,1',
+'12/14/2023,Target,-$5.00,groceries,amex,1',
+'12/14/2023,Target,-$35.83,groceries,apple,1',
+'12/15/2023,Amazon,$0.00,amazon,amex,1',
+'12/15/2023,Herbst,-$43.89,gifts,apple,1',
+'12/15/2023,Dogwood,-$55.00,gifts,apple,1',
+'12/15/2023,Target,-$70.12,groceries,apple,1',
+'12/15/2023,Target,-$4.41,groceries,apple,1',
+'12/16/2023,Mpls Parking,-$1.25,other,apple,1',
+'12/16/2023,Cardigan Donuts,-$25.00,resturants,apple,1',
+'12/18/2023,Amazon,-$18.34,amazon,amex,1',
+'12/21/2023,gas,-$36.24,gas,apple,1'
 ];
 
 	const populateExport = () => {
@@ -295,8 +310,8 @@
 					<th scope="row">${entry.date}</th>
 					<td>${entry.description}</td>
 					<td>${entry.amount}</td>
-					<td>${entry.category}</td>
-					<td>${entry.source}</td>
+					<td>${icons[entry.category]}</td>
+					<td>${icons[entry.source]}</td>
     		</tr>`);
 			});
 		};
