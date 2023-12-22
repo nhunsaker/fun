@@ -19,10 +19,13 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="#" id="showTransactions">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
+          <a class="nav-link" href="#" id="showEdit">Add</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"  id="showExport">Import/Export</a>
         </li>
       </ul>
     </div>
@@ -34,7 +37,7 @@
 
 
 <!-- // Start import/export form -->
-<div class="container-fluid">
+<div class="container-fluid d-none" id="viewExport">
 <form class="p-4 m-4 border rounded-4">
   <fieldset>
     <legend>Import/Export</legend>
@@ -72,7 +75,7 @@
 
 
 <!-- // Start edit form -->
-<div class="container-fluid">
+<div class="container-fluid d-none" id="viewEdit">
 <form class="p-4 m-4 border rounded-4">
   <fieldset>
     <legend>Add</legend>
@@ -125,7 +128,7 @@
 </div>
 <!-- // End edit form -->
 
-<div class="m-4">
+<div class="m-4" id="viewBudget">
 	<h4 class="text-center">
       Budget
     </h4>
@@ -144,6 +147,7 @@
 
 
 <!-- // Start transactions table -->
+<div id="viewTransactions">
 <h4 class="text-center">
       December 2023
 </h4>
@@ -157,7 +161,7 @@
       <th scope="col">Source</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="transactionsView">
     <tr>
       <th scope="row">1</th>
       <td>Amazon</td>
@@ -176,6 +180,7 @@
 
   </tbody>
 </table>
+</div>
 <!-- // End transactions table -->
 
 
@@ -271,6 +276,31 @@
 			console.error('Decode transactions', transactions);
 		}
 		populateExport();
+
+		const buildTransactionsView = () => {
+			$("#transactionsView").empty();
+			const enteries = transactions.map(row => { 
+				const entry = row.split(',');
+				return {
+					date: entry[0],
+					description: entry[1],
+					amount: entry[2],
+					category: entry[3],
+					source: entry[4],
+					posted: entry[5],
+				}
+			});
+			$.each(enteries, function(index, entry) {
+    			$("#transactionsView").append(`<tr>
+					<th scope="row">${entry.date}</th>
+					<td>${entry.description}</td>
+					<td>${entry.amount}</td>
+					<td>${entry.category}</td>
+					<td>${entry.source}</td>
+    		</tr>`);
+			});
+		};
+		buildTransactionsView();
 		
 
     	// Set the edit form options
@@ -282,6 +312,27 @@
 	$.each(sources, function(index, value) {
     	sourceSelect.append($("<option></option>").val(value).text(value));
 	});
+
+
+	$("#showExport").click(function() {
+			$("#viewEdit").addClass('d-none');
+			$("#viewBudget").addClass('d-none');
+			$("#viewTransactions").addClass('d-none');
+			$("#viewExport").removeClass('d-none');
+	});
+	$("#showEdit").click(function() {
+			$("#viewExport").addClass('d-none');
+			$("#viewBudget").addClass('d-none');
+			$("#viewTransactions").addClass('d-none');
+			$("#viewEdit").removeClass('d-none');
+	});
+	$("#showTransactions").click(function() {
+			$("#viewExport").addClass('d-none');
+			$("#viewEdit").addClass('d-none');
+			$("#viewBudget").removeClass('d-none');
+			$("#viewTransactions").removeClass('d-none');
+	});
+
     });
  
    
