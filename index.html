@@ -1,61 +1,230 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FUN.2024</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 </head>
 <body>
 
+<nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">🐽💰</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>	
+
+
+<!-- // Start import/export form -->
+<div class="container-fluid">
+<form class="p-4 m-4 border rounded-4">
+  <fieldset>
+    <legend>Import/Export</legend>
+<div class="grid mb-3">
+<div class="mb-2 g-col-12">
+  	<label for="categoryData" class="form-label">Categories</label>
+	<textarea class="form-control" id="categoryData" rows="3" name="categoryData"></textarea>
+</div>
+<div class="mb-2 g-col-12">
+  	<label for="sourceData" class="form-label">Sources</label>
+	<textarea class="form-control" id="sourceData" rows="3" name="sourceData"></textarea>
+</div>
+<div class="mb-2 g-col-12">
+  	<label for="budgetData" class="form-label">Budgets</label>
+	<textarea class="form-control" id="budgetData" rows="3" name="budgetData"></textarea>
+</div>
+<div class="mb-2 g-col-12">
+  	<label for="transactionData" class="form-label">Transactions</label>
+	<textarea class="form-control" id="transactionData" rows="3" name="transactionData"></textarea>
+</div>
+<button type="submit" class="btn btn-primary mt-2">Save</button>
+</div>
+  </fieldset>
+</form>
+</div>
+<!-- // End edit form -->
+
+
+<!-- // Start edit form -->
+<div class="container-fluid">
 <form class="p-4 m-4 border rounded-4">
   <fieldset>
     <legend>Add</legend>
 <div class="grid mb-3">
 
-<div class="mb-4 g-col-12 lg-col-3 input-group">
-	<span class="input-group-text">Description</span>
+<div class="mb-2 g-col-12 lg-col-3">
+  	<label for="description" class="form-label">Description</label>
 	<input type="text" placeholder="description" id="description" name="description" class="form-control"/>
 </div>
 
-<div class="mb-4 g-col-12 lg-col-4 input-group">
-	<span class="input-group-text">Date</span>
+<div class="mb-2 g-col-12 lg-col-4">
+  	<label for="date" class="form-label">Date</label>
 	<input type="date" id="date" name="date" class="form-control"/>
 </div>
 
-<div class="mb-4 g-col-12 lg-col-4 input-group">
-	<span class="input-group-text">$</span>
-	<input type="number" placeholder="00.00" id="amount" name="amount" class="form-control"/>
+<div class="mb-2 g-col-12 lg-col-4">
+  	<label for="date" class="form-label">Amount</label>
+  	<div class="input-group">
+		<span class="input-group-text">$</span>
+		<input type="number" placeholder="00.00" id="amount" name="amount" class="form-control"/>
+	</div>
 </div>
 
-<div class="mb-4 g-col-12 lg-col-4 input-group">
-	<span class="input-group-text">Category</span>
-<select class="form-select id="category">
-  <option selected>Groceries</option>
-  <option value="1">Clothing</option>
-  <option value="2">Amazon</option>
-  <option value="3">Resturants</option>
-  <option value="3">Gas</option>
-  <option value="3">Other</option>
-  <option value="3">Vacation</option>
+<div class="mb-2 g-col-12 lg-col-4">
+  	<label for="category" class="form-label">Category</label>
+<select class="form-select text-capitalize" id="categorySelect">
+  <option value="" disabled selected>Select:</option>
 </select>
 </div>
 
-<div class="mb-4 g-col-12 lg-col-4 input-group">
-	<span class="input-group-text">Source</span>
-<select class="form-select" id="source">
-  <option selected>Cash</option>
-  <option value="1">Apple Card</option>
-  <option value="2">Amex</option>
-  <option value="3">Debit</option>
-  <option value="3">Chase</option>
+<div class="mb-2 g-col-12 lg-col-4">
+  	<label for="sourceMenu" class="form-label">Source</label>
+<select class="form-select text-capitalize" id="sourceSelect">
+  <option value="" disabled selected>Select:</option>
 </select>
-<button type="submit" class="btn btn-primary">Save</button>
 </div>
 
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" value="" id="posted">
+  <label class="form-check-label" for="posted">
+    Posted
+  </label>
+</div>
+
+<button type="submit" class="btn btn-primary mt-2">Save</button>
 
 </div>
   </fieldset>
 </form>
+</div>
+<!-- // End edit form -->
+
+<div class="m-4">
+	<h4 class="text-center">
+      Budget
+    </h4>
+  <div class="row">
+    <div class="col-1">
+      🛒
+    </div>
+    <div class="col-11">
+      <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+  <div class="progress-bar bg-success" style="width: 25%">$100/$200</div>
+</div>
+    </div>
+  </div>
+  
+</div>
+
+
+<!-- // Start transactions table -->
+<h4 class="text-center">
+      December 2023
+</h4>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Day</th>
+      <th scope="col">Desc.</th>
+      <th scope="col">Amount</th>
+      <th scope="col">Cat</th>
+      <th scope="col">Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Amazon</td>
+      <td>0.00</td>
+      <td>Amazon</td>
+      <td>Amex</td>
+    </tr>
+
+    <tr>
+      <th scope="row">15</th>
+      <td>Herbst</td>
+      <td>0.00</td>
+      <td>Amazon</td>
+      <td>Apple Pay</td>
+    </tr>
+
+  </tbody>
+</table>
+<!-- // End transactions table -->
+
+
+
+<script>
+	// Defaults
+	var categories = ['groceries', 'clothing', 'resturants', 'gas', 'other', 'vacation'];
+	var sources = ['cash', 'amex', 'apple', 'etrade', 'chase'];
+	var budget = [];
+	var transactions = ['12/1/23,Noodles & Co ,-$11.84,Resturants,apple,1'];
+
+	Cookies.set('categories', 'value');
+	const test = Cookies.get('categories');
+			console.error('test', test);
+
+
+    $( document ).ready(function() {
+    	// Load the cookie data
+
+
+    	if (Cookies.get('categories') == null) {
+
+		
+
+			console.error('Setting categories default cookie');
+			Cookies.set('categories', categories, { path: '' });
+    	}
+    	if (!Cookies.get('sources')) {
+			console.error('Setting sources default cookie');
+			Cookies.set('sources', sources);
+    	}
+    	if (!Cookies.get('budget')) {
+			console.error('Setting budget default cookie');
+			Cookies.set('budget', budget);
+    	}
+    	if (!Cookies.get('transactions')) {
+			console.error('Setting transactions default cookie');
+			Cookies.set('transactions', transactions);
+    	}
+
+
+
+    	
+
+
+
+    	// Set the edit form options
+	var categorySelect = $("#categorySelect");
+	$.each(categories, function(index, value) {
+    	categorySelect.append($("<option></option>").val(value).text(value));
+	});
+	var sourceSelect = $("#sourceSelect");
+	$.each(sources, function(index, value) {
+    	sourceSelect.append($("<option></option>").val(value).text(value));
+	});
+    });
+ 
+   
+</script>
+
 
 </body>
 </html>
