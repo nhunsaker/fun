@@ -132,8 +132,8 @@
 <div class="m-4" id="viewBudget">
 	<h4 class="text-center">
       Budget 
-      <button id="openBudget" type="button" class="btn btn-primary btn-sm">&#8595;</button>
-      <button id="closeBudget" type="button" class="btn btn-primary btn-sm d-none">&#8593;</button>
+      <button id="openBudget" type="button" class="btn btn-primary btn-sm">&darr;</button>
+      <button id="closeBudget" type="button" class="btn btn-primary btn-sm d-none">&uarr;</button>
     </h4>
     <div id="viewBudgetSummary"></div>
     <div id="viewBudgetListing" class="d-none"></div>
@@ -142,7 +142,14 @@
 
 <!-- // Start transactions table -->
 <div id="viewTransactions">
-<h4 class="text-center" id="selectedDate"></h4>
+
+<h4 class="text-center">
+	<button id="prevDate" type="button" class="btn btn-primary btn-sm">&larr;</button>
+	<span id="selectedDate"></span>
+	<button id="nextDate" type="button" class="btn btn-primary btn-sm">&rarr;</button>
+</h4>      
+
+
 <table class="table">
   <thead>
     <tr>
@@ -228,10 +235,8 @@ var today = moment();
 var selectedDate = moment();
 
 var isFirstPeriod = selectedDate.format("DD") < 15;
-var startDate = (isFirstPeriod) ? selectedDate.clone().set('date', 1) : selectedDate.clone().set('date', 14);
-var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 15) : selectedDate.clone().set('date', 31);
-
-$("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.format("DD") >= 15) ? ` (2/2)` : ` (1/2)`);
+var startDate = (isFirstPeriod) ? selectedDate.clone().startOf('month') : selectedDate.clone().set('date', 14);
+var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 15) : selectedDate.clone().endOf('month');
 
 
 	const populateExport = () => {
@@ -295,22 +300,23 @@ $("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.
 
 		const filterByDateRange = ({ date }) =>  moment(date, "MM/DD/YYYY").isSameOrAfter(startDate) && moment(date, "MM/DD/YYYY").isSameOrBefore(endDate);
 
+		const parseTransactionItem = (item) => {
+				return {
+					date: moment(item[0], "MM/DD/YYYY"),
+					description: item[1],
+					amount: parseInt(item[2]).toFixed(2),
+					category: item[3],
+					source: item[4],
+					posted: item[5],
+				}
+		}
 
 		const buildTransactionsView = () => {
+			$("#selectedDate").empty();
+			$("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.format("DD") >= 15) ? ` (2/2)` : ` (1/2)`);
+
 			$("#transactionsView").empty();
-
-			const enteries = transactions.map(row => { 
-				const entry = row.split(',');
-				return {
-					date: moment(entry[0], "MM/DD/YYYY"),
-					description: entry[1],
-					amount: parseInt(entry[2]).toFixed(2),
-					category: entry[3],
-					source: entry[4],
-					posted: entry[5],
-				}
-			});
-
+			const enteries = transactions.map(row => parseTransactionItem(row.split(',')));
 			$.each(enteries.filter(filterByDateRange), function(index, entry) {
 					$("#transactionsView").append(`<tr>
 					<th scope="row">${entry.date.format("DD")}</th>
@@ -324,14 +330,15 @@ $("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.
 		buildTransactionsView();
 
 
-		const parseBudgetItem = () => {
+		const parseBudgetItem = (item) => {
 			return {
-					start: moment(entry[0], "MM/DD/YYYY"),
-					end: moment(entry[1], "MM/DD/YYYY"),
-					category: entry[2],
-					limit: limit.toFixed(2),
-					current: current.toFixed(2),
-					percent: (current / limit) * 100,
+					date: moment(item[0], "MM/DD/YYYY"),
+					start: moment(item[1], "MM/DD/YYYY"),
+					end: moment(item[1], "MM/DD/YYYY"),
+					category: item[2],
+					limit: parseInt(item[3]),
+					current: 0,
+					percent: 0,
 			};
 		}
 
@@ -348,22 +355,20 @@ $("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.
 			});
 			let grandLimit = 0;
 			let grandCurrent = 0;
-			const enteries = budget.map(row => { 
-				const entry = row.split(',');
-				const filtered = transactionsForBudget.filter(filterByDateRange).filter(item => item.category === entry[2]);
+			const enteries = budget
+				.map(row => parseBudgetItem(row.split(',')))
+				.filter(filterByDateRange)
+				.map(budgetItem => { 
+				const filtered = transactionsForBudget.filter(filterByDateRange).filter(item => item.category === budgetItem.category);
 				const current = filtered.reduce((accumulator, item) => {
   					return accumulator + parseInt(item.amount)*-1;
 				}, 0); // Initial value of accumulator is 0
 				grandCurrent = grandCurrent + current;
-				const limit = parseInt(entry[3]);
-				grandLimit = grandLimit + limit;
+				grandLimit = grandLimit + budgetItem.limit;
 				return {
-					start: moment(entry[0], "MM/DD/YYYY"),
-					end: moment(entry[1], "MM/DD/YYYY"),
-					category: entry[2],
-					limit: limit.toFixed(2),
+					...budgetItem,
 					current: current.toFixed(2),
-					percent: (current / limit) * 100,
+					percent: (current / budgetItem.limit) * 100,
 				}
 			});
 			const grandPercent = (grandCurrent / grandLimit) * 100;
@@ -434,6 +439,37 @@ $("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.
 			$("#openBudget").removeClass('d-none');
 			$("#viewBudgetListing").addClass('d-none');
 			$("#viewBudgetSummary").removeClass('d-none');
+	});
+
+	$("#prevDate").click(function() {
+		if (isFirstPeriod) {
+			selectedDate = selectedDate.clone().set('date', 15).subtract(1, 'month');
+			isFirstPeriod = false;
+			startDate = selectedDate;
+			endDate = selectedDate.clone().endOf('month');
+		} else {
+			selectedDate = selectedDate.clone().set('date', 1);
+			isFirstPeriod = true;
+			startDate = selectedDate.startOf('month');
+			endDate = selectedDate.clone().set('date', 14);
+		}
+		buildTransactionsView();
+		buildBudgetsView();
+	});
+	$("#nextDate").click(function() {
+		if (isFirstPeriod) {
+			selectedDate = selectedDate.clone().set('date', 15);
+			isFirstPeriod = false;
+			startDate = selectedDate;
+			endDate = selectedDate.clone().endOf('month');
+		} else {
+			selectedDate = selectedDate.clone().set('date', 1).add(1, 'month');
+			isFirstPeriod = true;
+			startDate = selectedDate.startOf('month');
+			endDate = selectedDate.clone().set('date', 14);
+		}
+		buildTransactionsView();
+		buildBudgetsView();
 	});
 
     });
