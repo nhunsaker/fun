@@ -39,7 +39,7 @@
 
 <!-- // Start import/export form -->
 <div class="container-fluid d-none" id="viewExport">
-<form class="p-4 m-4 border rounded-4">
+<form class="p-4 m-4 border rounded-4" id="exportForm">
   <fieldset>
     <legend>Import/Export</legend>
 <div class="grid mb-3">
@@ -77,26 +77,26 @@
 
 <!-- // Start edit form -->
 <div class="container-fluid d-none" id="viewEdit">
-<form class="p-4 m-4 border rounded-4">
+<form class="p-4 m-4 border rounded-4" id="transactionForm">
   <fieldset>
-    <legend>Add</legend>
+    <legend id="transactionHeader">Add</legend>
 <div class="grid mb-3">
 
 <div class="mb-2 g-col-12 lg-col-3">
-  	<label for="description" class="form-label">Description</label>
-	<input type="text" placeholder="description" id="description" name="description" class="form-control"/>
+  	<label for="descriptionInput" class="form-label">Description</label>
+	<input type="text" placeholder="description" id="descriptionInput" name="descriptionInput" class="form-control"/>
 </div>
 
 <div class="mb-2 g-col-12 lg-col-4">
-  	<label for="date" class="form-label">Date</label>
-	<input type="date" id="date" name="date" class="form-control"/>
+  	<label for="dateInput" class="form-label">Date</label>
+	<input type="date" id="dateInput" name="dateInput" class="form-control"/>
 </div>
 
 <div class="mb-2 g-col-12 lg-col-4">
-  	<label for="date" class="form-label">Amount</label>
+  	<label for="amountInput" class="form-label">Amount</label>
   	<div class="input-group">
 		<span class="input-group-text">$</span>
-		<input type="number" placeholder="00.00" id="amount" name="amount" class="form-control"/>
+		<input type="number" placeholder="00.00" id="amountInput" name="amountInput" class="form-control"/>
 	</div>
 </div>
 
@@ -114,14 +114,34 @@
 </select>
 </div>
 
-<div class="form-check">
-  <input class="form-check-input" type="checkbox" value="" id="posted">
-  <label class="form-check-label" for="posted">
-    Posted
-  </label>
+<div class="row">
+<div class="mt-2 col-6">
+	<div class="form-check">
+	  <input class="form-check-input" type="checkbox" value="" id="depositCheck">
+	  <label class="form-check-label" for="depositCheck">
+	    Deposit
+	  </label>
+	</div>
+</div>
+<div class="mt-2 col-6 align-right">
+	<div class="form-check">
+	  <input class="form-check-input" type="checkbox" value="" id="postedCheck">
+	  <label class="form-check-label" for="postedCheck">
+	    Posted
+	  </label>
+	</div>
+</div>
 </div>
 
-<button type="submit" class="btn btn-primary mt-2">Save</button>
+<div class="row">
+<div class="mt-2 col-6">
+  	<button type="button" class="btn btn-primary mt-2" id="saveTransaction">Save</button>
+</div>
+<div class="mt-2 col-6 align-right">
+	<button type="button" class="btn btn-danger mt-2" id="deleteTransaction">Delete</button>
+</div>
+</div>
+
 
 </div>
   </fieldset>
@@ -147,6 +167,7 @@
 	<button id="prevDate" type="button" class="btn btn-primary btn-sm">&larr;</button>
 	<span id="selectedDate"></span>
 	<button id="nextDate" type="button" class="btn btn-primary btn-sm">&rarr;</button>
+	<button id="showAdd" type="button" class="btn btn-primary btn-sm">&plus;</button>
 </h4>      
 
 
@@ -168,6 +189,7 @@
 
 
 <script>
+	const getUUID = () => window.crypto.randomUUID();
 	// Defaults
 	var icons = {
 		groceries: '🛒',
@@ -201,7 +223,7 @@
 '12/15/2023,12/31/2023,resturants,80',
 '12/15/2023,12/31/2023,gas,45',
 '12/15/2023,12/31/2023,other,0',
-'12/15/2023,12/31/2023,vacation,550',
+'12/15/2023,12/31/2023,vacation,677',
 '12/15/2023,12/31/2023,gifts,0'
 ];
 	var transactions = [
@@ -221,7 +243,7 @@
 '12/11/2023,Target,-21.00,groceries,apple,1',
 '12/14/2023,Target,-5.00,groceries,amex,1',
 '12/14/2023,Target,-35.83,groceries,apple,1',
-'12/15/2023,Amazon,0.00,amazon,amex,1',
+'12/15/2023,Amazon,1.00,amazon,amex,0',
 '12/15/2023,Herbst,-43.89,gifts,apple,1',
 '12/15/2023,Dogwood,-55.00,gifts,apple,1',
 '12/15/2023,Target,-70.12,groceries,apple,1',
@@ -229,7 +251,11 @@
 '12/16/2023,Mpls Parking,-1.25,other,apple,1',
 '12/16/2023,Cardigan Donuts,-25.00,resturants,apple,1',
 '12/18/2023,Amazon,-18.34,amazon,amex,1',
-'12/21/2023,Gas,-36.24,gas,apple,1'
+'12/21/2023,Gas,-36.24,gas,apple,1',
+'12/22/2023,Kowalski,-6.32,groceries,amex,1',
+'12/23/2023,Whole Foods,-38.60,groceries,amex,1',
+'12/24/2023,Tim and Tom,-10.85,groceries,amex,1',
+'12/24/2023,Enterprise,-677.00,vacation,amex,1'
 ];
 var today = moment();
 var selectedDate = moment();
@@ -238,6 +264,16 @@ var isFirstPeriod = selectedDate.format("DD") < 15;
 var startDate = (isFirstPeriod) ? selectedDate.clone().startOf('month') : selectedDate.clone().set('date', 14);
 var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 15) : selectedDate.clone().endOf('month');
 
+var defaultTransaction =  {
+	date: moment(),
+	description: '',
+	amount: parseInt(0).toFixed(2),
+	category: null,
+	source: null,
+	posted: false,
+	uuid: getUUID(),
+}
+var selectedTransaction = { ...defaultTransaction };
 
 	const populateExport = () => {
 			$("#categoryData").val(JSON.stringify(categories));
@@ -296,37 +332,86 @@ var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 15) : selectedD
 			console.error('Decode budget', budget);
 			console.error('Decode transactions', transactions);
 		}
+		// Create UUID for transactions
+		transactions = transactions.map(item => item + ',' + getUUID() );
+
 		populateExport();
 
 		const filterByDateRange = ({ date }) =>  moment(date, "MM/DD/YYYY").isSameOrAfter(startDate) && moment(date, "MM/DD/YYYY").isSameOrBefore(endDate);
 
-		const parseTransactionItem = (item) => {
+		const parseTransactionItem = (item, index) => {
 				return {
 					date: moment(item[0], "MM/DD/YYYY"),
 					description: item[1],
 					amount: parseInt(item[2]).toFixed(2),
 					category: item[3],
 					source: item[4],
-					posted: item[5],
+					posted: !!parseInt(item[5]),
+					uuid: item[6],
 				}
+		};
+		const serializeTransaction = (entry) => {
+			return [
+				entry.date.format("MM/D/YYYY"),
+				entry.description,
+				entry.amount,
+				entry.category,
+				entry.source,
+				entry.posted,
+				entry.uuid
+			].join(',');
+		};
+
+		const buildEditView = (transactionId = null) => {
+			$("#viewExport").addClass('d-none');
+			$("#viewBudget").addClass('d-none');
+			$("#viewTransactions").addClass('d-none');
+			$("#viewEdit").removeClass('d-none');
+			const transactionItem = transactions.find(item => item.includes(transactionId));
+			if (transactionItem) {
+				$("#transactionHeader").text("Edit");
+				$("#saveTransaction").text("Update");
+				$("#deleteTransaction").prop("disabled", false);
+				selectedTransaction = parseTransactionItem(transactionItem.split(','));
+			} else {
+				$("#transactionHeader").text("Add");
+				$("#saveTransaction").text("Save");
+				$("#deleteTransaction").prop("disabled", true);
+				selectedTransaction = { ...defaultTransaction, uuid: getUUID()};
+			}
+			$("#descriptionInput").val(selectedTransaction.description);
+			$("#dateInput").val(selectedTransaction.date.format('YYYY-MM-DD'));
+			$("#amountInput").val(selectedTransaction.amount);
+			$("#categorySelect").val(selectedTransaction.category);
+			$("#sourceSelect").val(selectedTransaction.source);
+			$("#depositCheck").prop('checked', (selectedTransaction.amount > 0));
+			$("#postedCheck").prop('checked',selectedTransaction.posted);
 		}
+
 
 		const buildTransactionsView = () => {
 			$("#selectedDate").empty();
 			$("#selectedDate").text(selectedDate.format("MMMM YYYY")).append( (selectedDate.format("DD") >= 15) ? ` (2/2)` : ` (1/2)`);
 
 			$("#transactionsView").empty();
-			const enteries = transactions.map(row => parseTransactionItem(row.split(',')));
+			const enteries = transactions.map((row) => parseTransactionItem(row.split(',')));
 			$.each(enteries.filter(filterByDateRange), function(index, entry) {
-					$("#transactionsView").append(`<tr>
+					console.error();
+					$("#transactionsView").append(`<tr class="transaction-row" id="row-${entry.uuid}" data-role="${entry.uuid}">
 					<th scope="row">${entry.date.format("DD")}</th>
-					<td>${entry.description}</td>
+					<td><a href="#">${entry.description}</a></td>
 					<td>\$${entry.amount}</td>
 					<td>${icons[entry.category]}</td>
 					<td>${icons[entry.source]}</td>
     			</tr>`);
 			});
 		};
+
+		$("#transactionsView").on("click", "tr.transaction-row", function() {
+		    var transactionId = $(this).data("role");
+		    buildEditView(transactionId);
+		  });
+
 		buildTransactionsView();
 
 
@@ -410,19 +495,51 @@ var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 15) : selectedD
 	});
 
 
+	$("#saveTransaction").click(function() {
+		selectedTransaction = {
+			description: $("#descriptionInput").val(),
+			date: moment($("#dateInput").val(), "YYYY-MM-DD"),
+			category: $("#categorySelect").val(),
+			source: $("#sourceSelect").val(),
+			amount: parseInt($("#amountInput").val()).toFixed(2),
+			posted: ($("#postedCheck").prop("checked")) ? 1 : 0,
+			uuid: selectedTransaction.uuid,
+		};
+		if (selectedTransaction.uuid) {
+			var saveTransactions = transactions.filter(item => !item.includes(selectedTransaction.uuid));
+			saveTransactions.push(serializeTransaction(selectedTransaction));
+			transactions = saveTransactions;
+		}
+		$("#showTransactions").click();
+		Cookies.set('transactions', JSON.stringify(transactions));
+	});
+
+
+	$("#deleteTransaction").click(function() {
+		if (selectedTransaction.uuid) {
+			transactions = transactions.filter(item => !item.includes(selectedTransaction.uuid));
+		}
+		$("#showTransactions").click();
+		Cookies.set('transactions', JSON.stringify(transactions));
+	});
+
+
 	$("#showExport").click(function() {
+			populateExport();
 			$("#viewEdit").addClass('d-none');
 			$("#viewBudget").addClass('d-none');
 			$("#viewTransactions").addClass('d-none');
 			$("#viewExport").removeClass('d-none');
 	});
+	$("#showAdd").click(function() {
+			buildEditView(null);
+	});
 	$("#showEdit").click(function() {
-			$("#viewExport").addClass('d-none');
-			$("#viewBudget").addClass('d-none');
-			$("#viewTransactions").addClass('d-none');
-			$("#viewEdit").removeClass('d-none');
+			buildEditView(null);
 	});
 	$("#showTransactions").click(function() {
+			buildBudgetsView();
+			buildTransactionsView();
 			$("#viewExport").addClass('d-none');
 			$("#viewEdit").addClass('d-none');
 			$("#viewBudget").removeClass('d-none');
@@ -440,7 +557,6 @@ var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 15) : selectedD
 			$("#viewBudgetListing").addClass('d-none');
 			$("#viewBudgetSummary").removeClass('d-none');
 	});
-
 	$("#prevDate").click(function() {
 		if (isFirstPeriod) {
 			selectedDate = selectedDate.clone().set('date', 15).subtract(1, 'month');
