@@ -174,11 +174,11 @@
 <table class="table">
   <thead>
     <tr>
-      <th scope="col">Day</th>
-      <th scope="col">Desc.</th>
-      <th scope="col"><div class="text-end" style="width:80px;">Amount</div></th>
-      <th scope="col">Cat</th>
-      <th scope="col">Source</th>
+      <th scope="col" class="sortProperty" data-value="day">Day</th>
+      <th scope="col" class="sortProperty" data-value="description">Desc.</th>
+      <th scope="col" class="sortProperty" data-value="amount"><div class="text-end" style="width:80px;">Amount</div></th>
+      <th scope="col" class="sortProperty" data-value="category">Cat</th>
+      <th scope="col" class="sortProperty" data-value="source">Source</th>
     </tr>
   </thead>
   <tbody id="transactionsView"></tbody>
@@ -273,6 +273,7 @@ var selectedDate = moment();
 var isFirstPeriod = selectedDate.format("DD") < 15;
 var startDate = (isFirstPeriod) ? selectedDate.clone().startOf('month') : selectedDate.clone().set('date', 14);
 var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 15) : selectedDate.clone().endOf('month');
+var sortBy = { property: 'date', asc: false };
 
 var defaultTransaction =  {
 	date: moment(),
@@ -349,6 +350,20 @@ var selectedTransaction = { ...defaultTransaction };
 
 		const filterByDateRange = ({ date }) =>  moment(date, "MM/DD/YYYY").isSameOrAfter(startDate) && moment(date, "MM/DD/YYYY").isSameOrBefore(endDate);
 
+		const getSortValue = (item) => {
+			if (sortBy.property === 'date') {
+				return moment(item[0], "MM/DD/YYYY").format("DDDD");
+			} else if (sortBy.property === 'description') {
+				return item[1];
+			} else if (sortBy.property === 'category') {
+				return item[3];
+			} else if (sortBy.property === 'source') {
+				return item[4];
+			} else if (sortBy.property === 'amount') {
+				return parseInt(item[2]) * -1;
+			}
+		}
+
 		const parseTransactionItem = (item, index) => {
 				return {
 					date: moment(item[0], "MM/DD/YYYY"),
@@ -358,6 +373,7 @@ var selectedTransaction = { ...defaultTransaction };
 					source: item[4],
 					posted: !!parseInt(item[5]),
 					uuid: item[6],
+					sort: getSortValue(item),
 				}
 		};
 		const serializeTransaction = (entry) => {
@@ -405,8 +421,16 @@ var selectedTransaction = { ...defaultTransaction };
 
 			$("#transactionsView").empty();
 			const enteries = transactions.map((row) => parseTransactionItem(row.split(',')));
-			$.each(enteries.filter(filterByDateRange), function(index, entry) {
-					console.error();
+			const sortEntry = (next, previous) => {
+				if (['day', 'amount'].includes(sortBy.property)) {
+					return (next.sort - previous.sort);
+				} else {
+					return next.sort.localeCompare(previous.sort);
+				}
+			}
+			const toggleSort = (list) => (sortBy.asc) ? list : list.reverse();
+
+			$.each(toggleSort(enteries.filter(filterByDateRange).sort(sortEntry)), function(index, entry) {
 					$("#transactionsView").append(`<tr class="transaction-row" id="row-${entry.uuid}" data-role="${entry.uuid}">
 					<th scope="row">${entry.date.format("DD")}</th>
 					<td><a href="#">${entry.description}</a></td>
@@ -614,7 +638,16 @@ var selectedTransaction = { ...defaultTransaction };
 		buildTransactionsView();
 		buildBudgetsView();
 	});
-
+	$(".sortProperty").click(function() {
+		const property = $(this).attr('data-value');
+		if (sortBy.property = property) {
+			sortBy.asc = !sortBy.asc;
+		} else {
+			sortBy.property = property;
+			sortBy.asc = true;
+		};
+		buildTransactionsView();
+	});
     });
  
    
