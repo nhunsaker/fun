@@ -176,7 +176,7 @@
     <tr>
       <th scope="col">Day</th>
       <th scope="col">Desc.</th>
-      <th scope="col">Amount</th>
+      <th scope="col"><div class="text-end" style="width:80px;">Amount</div></th>
       <th scope="col">Cat</th>
       <th scope="col">Source</th>
     </tr>
@@ -410,7 +410,7 @@ var selectedTransaction = { ...defaultTransaction };
 					$("#transactionsView").append(`<tr class="transaction-row" id="row-${entry.uuid}" data-role="${entry.uuid}">
 					<th scope="row">${entry.date.format("DD")}</th>
 					<td><a href="#">${entry.description}</a></td>
-					<td>\$${entry.amount}</td>
+					<td class="text-right"><div class="text-end" style="width:80px;">\$${entry.amount}</div></td>
 					<td>${icons[entry.category]}</td>
 					<td>${icons[entry.source]}</td>
     			</tr>`);
@@ -473,11 +473,13 @@ var selectedTransaction = { ...defaultTransaction };
 					return 'danger';
 				} else if (percent >= 75) {
 					return 'warning';	
+				} else if (percent <= 0) {
+					return 'secondary';
 				} else {
 					return 'success';
 				}
 			};
-			const grandPercent = (grandCurrent / grandLimit) * 100;
+			let grandPercent = (grandCurrent / grandLimit) * 100;
 			const grandRemain = (grandLimit - grandCurrent);
 			$.each(enteries, function(index, entry) {
 					$("#viewBudgetListing").append(`
@@ -498,8 +500,8 @@ var selectedTransaction = { ...defaultTransaction };
 				    <div class="col-1">💰</div>
 				    <div class="col-11">
 				      	<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-				  			<div class="text-start progress-bar bg-${getStyleByPercent(grandPercent)}" style="width: ${grandPercent}%">
-				  			\$${grandRemain} of \$${grandLimit} 
+				  			<div class="text-start progress-bar bg-${getStyleByPercent(grandPercent)}" style="width: ${(grandPercent>0) ? grandPercent : 100}%">
+				  			\$${grandRemain} of \$${grandLimit}
 				  			</div>
 						</div>
 				    </div>
