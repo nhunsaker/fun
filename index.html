@@ -159,6 +159,7 @@
     <div id="viewBudgetListing" class="d-none"></div>
 </div>
 
+<div id="pieChart"></div>
 
 <!-- // Start transactions table -->
 <div id="viewTransactions">
@@ -503,17 +504,17 @@ var selectedTransaction = { ...defaultTransaction };
 				return {
 					...budgetItem,
 					current: current.toFixed(2),
-					percent: (remaining >= 0) ? (current / budgetItem.limit).toFixed(2) * 100 : 101,
+					percent: (remaining != budgetItem.limit) ? (current / budgetItem.limit).toFixed(2) * 100 : 999,
 					remaining,
 				}
 			});
 			const getStyleByPercent = (percent) => {
-				if (percent > 100) {
+				if (percent > 998) {
+					return 'secondary';				
+				} else if (percent > 100) {
 					return 'danger';
 				} else if (percent >= 75) {
 					return 'warning';	
-				} else if (percent <= 0) {
-					return 'secondary';
 				} else {
 					return 'success';
 				}
@@ -549,6 +550,9 @@ var selectedTransaction = { ...defaultTransaction };
 		};
 		buildBudgetsView();
 		
+
+		const buildPiechartView = () => { };
+		buildPiechartView();
 
     	// Set the edit form options
 	var categorySelect = $("#categorySelect");
