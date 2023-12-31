@@ -197,7 +197,7 @@
 		clothing: '👕',
 		resturants: '🍽️',
 		gas: '🚗',
-		other: '❓',
+		other: '🤔',
 		vacation: '🏖️',
 		gifts: '🎁',
 		cash: '💸',
@@ -224,7 +224,17 @@
 '12/15/2023,12/31/2023,gas,45',
 '12/15/2023,12/31/2023,other,0',
 '12/15/2023,12/31/2023,vacation,677',
-'12/15/2023,12/31/2023,gifts,0'
+'12/15/2023,12/31/2023,gifts,0',
+'1/1/2024,1/14/2024,groceries,300',
+'1/1/2024,1/14/2024,amazon,75',
+'1/1/2024,1/14/2024,resturants,100',
+'1/1/2024,1/14/2024,gas,40',
+'1/1/2024,1/14/2024,other,100',
+'1/15/2024,1/31/2024,groceries,170',
+'1/15/2024,1/31/2024,amazon,75',
+'1/15/2024,1/31/2024,resturants,100',
+'1/15/2024,1/31/2024,gas,40',
+'1/15/2024,1/31/2024,other,100',
 ];
 	var transactions = [
 '12/1/23,Noodles & Co ,-11.84,resturants,apple,1',
@@ -450,21 +460,34 @@ var selectedTransaction = { ...defaultTransaction };
 				}, 0); // Initial value of accumulator is 0
 				grandCurrent = grandCurrent + current;
 				grandLimit = grandLimit + budgetItem.limit;
+				remaining = Math.round(budgetItem.limit - current);
 				return {
 					...budgetItem,
 					current: current.toFixed(2),
-					percent: (current / budgetItem.limit) * 100,
+					percent: (remaining >= 0) ? (current / budgetItem.limit).toFixed(2) * 100 : 101,
+					remaining,
 				}
 			});
+			const getStyleByPercent = (percent) => {
+				if (percent > 100) {
+					return 'danger';
+				} else if (percent >= 75) {
+					return 'warning';	
+				} else {
+					return 'success';
+				}
+			};
 			const grandPercent = (grandCurrent / grandLimit) * 100;
-
+			const grandRemain = (grandLimit - grandCurrent);
 			$.each(enteries, function(index, entry) {
 					$("#viewBudgetListing").append(`
 						  <div class="row">
 						    <div class="col-1">${icons[entry.category]}</div>
 						    <div class="col-11">
 						      	<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-						  			<div class="progress-bar bg-success" style="width: ${entry.percent}%">\$${entry.current}/\$${entry.limit}</div>
+						  			<div class="text-start progress-bar bg-${getStyleByPercent(entry.percent)}" style="width: ${entry.percent}%">
+						  			\$${entry.remaining} of \$${entry.limit}
+						  			</div>
 								</div>
 						    </div>
 						  </div>
@@ -475,7 +498,9 @@ var selectedTransaction = { ...defaultTransaction };
 				    <div class="col-1">💰</div>
 				    <div class="col-11">
 				      	<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-				  			<div class="progress-bar bg-success" style="width: ${grandPercent}%">\$${grandCurrent.toFixed(2)}/\$${grandLimit.toFixed(2)}</div>
+				  			<div class="text-start progress-bar bg-${getStyleByPercent(grandPercent)}" style="width: ${grandPercent}%">
+				  			\$${grandRemain} of \$${grandLimit} 
+				  			</div>
 						</div>
 				    </div>
 				  </div>
