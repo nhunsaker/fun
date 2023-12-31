@@ -217,14 +217,12 @@
 '12/1/2023,12/14/2023,other,107',
 '12/1/2023,12/14/2023,vacation,0',
 '12/1/2023,12/14/2023,gifts,0',
-'12/15/2023,12/31/2023,groceries,170',
-'12/15/2023,12/31/2023,amazon,18.34',
-'12/15/2023,12/31/2023,clothing,0',
-'12/15/2023,12/31/2023,resturants,80',
-'12/15/2023,12/31/2023,gas,45',
-'12/15/2023,12/31/2023,other,0',
-'12/15/2023,12/31/2023,vacation,677',
-'12/15/2023,12/31/2023,gifts,0',
+'12/15/2023,12/31/2023,groceries,130',
+'12/15/2023,12/31/2023,amazon,24',
+'12/15/2023,12/31/2023,resturants,31.04',
+'12/15/2023,12/31/2023,gas,36.24',
+'12/15/2023,12/31/2023,other,4.50',
+'12/15/2023,12/31/2023,vacation,1062.80',
 '1/1/2024,1/14/2024,groceries,300',
 '1/1/2024,1/14/2024,amazon,75',
 '1/1/2024,1/14/2024,resturants,100',
@@ -265,7 +263,24 @@
 '12/22/2023,Kowalski,-6.32,groceries,amex,1',
 '12/23/2023,Whole Foods,-38.60,groceries,amex,1',
 '12/24/2023,Tim and Tom,-10.85,groceries,amex,1',
-'12/24/2023,Enterprise,-677.00,vacation,amex,1'
+'12/24/2023,Caribou Coffee,-6.04,resturants,apple,1',
+'12/26/2023,McKee,-30.00,vacation,apple,1',
+'12/26/2023,Publix ,-96.04,vacation,apple,1',
+'12/26/2023,Grind+Grape,-4.26,vacation,apple,1',
+'12/27/2023,Old FL Coffee,-58.83,vacation,apple,1',
+'12/27/2023,Pelican Seafood,-90.96,vacation,apple,1',
+'12/27/2023,Grind+Grape,-9.61,vacation,apple,1',
+'12/27/2023,Amazon,-5.66,Amazon,vacation,1',
+'12/27/2023,Apple Show,-3.24,other,apple,1',
+'12/28/2023,McDonolds,-22.22,vacation,apple,1',
+'12/28/2023,Vero Beach Museum,-24,vacation,apple,1',
+'12/28/2023,Taco Dive,-36.36,vacation,apple,1',
+'12/28/2023,AMC Food,-13.86,vacation,apple,1',
+'12/29/2023,Enterprise,-676.66,vacation,amex,1',
+'1/1/2024,Breadsmith,-18.59,groceries,apple,1',
+'1/1/2024,Starbucks,-4.84,resturants,apple,1',
+'1/1/2024,Amazon Household,-14.36,amazon,apple,1',
+'1/1/2024,Tim and Tims,-31.18,groceries,apple,1',
 ];
 var today = moment();
 var selectedDate = moment();
@@ -273,7 +288,7 @@ var selectedDate = moment();
 var isFirstPeriod = selectedDate.format("DD") < 15;
 var startDate = (isFirstPeriod) ? selectedDate.clone().startOf('month') : selectedDate.clone().set('date', 14);
 var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 15) : selectedDate.clone().endOf('month');
-var sortBy = { property: 'date', asc: false };
+var sortBy = { property: 'date', asc: true };
 
 var defaultTransaction =  {
 	date: moment(),
@@ -639,7 +654,9 @@ var selectedTransaction = { ...defaultTransaction };
 		buildBudgetsView();
 	});
 	$(".sortProperty").click(function() {
+		$(".sortProperty").removeClass("text-decoration-underline");
 		const property = $(this).attr('data-value');
+		$(this).addClass('text-decoration-underline');
 		if (sortBy.property = property) {
 			sortBy.asc = !sortBy.asc;
 		} else {
