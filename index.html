@@ -229,8 +229,8 @@
 '1/1/2024,1/14/2024,resturants,100',
 '1/1/2024,1/14/2024,gas,40',
 '1/1/2024,1/14/2024,other,100',
-'1/15/2024,1/31/2024,groceries,170',
-'1/15/2024,1/31/2024,amazon,75',
+'1/15/2024,1/31/2024,groceries,1',
+'1/15/2024,1/31/2024,amazon,1',
 '1/15/2024,1/31/2024,resturants,100',
 '1/15/2024,1/31/2024,gas,40',
 '1/15/2024,1/31/2024,other,100',
@@ -287,8 +287,8 @@ var today = moment();
 var selectedDate = moment();
 
 var isFirstPeriod = selectedDate.format("DD") < 15;
-var startDate = (isFirstPeriod) ? selectedDate.clone().startOf('month') : selectedDate.clone().set('date', 14);
-var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 15) : selectedDate.clone().endOf('month');
+var startDate = (isFirstPeriod) ? selectedDate.clone().startOf('month') : selectedDate.clone().set('date', 15);
+var endDate = (isFirstPeriod) ? selectedDate.clone().set('date', 14) : selectedDate.clone().endOf('month');
 var sortBy = { property: 'date', asc: true };
 
 var defaultTransaction =  {
@@ -519,6 +519,16 @@ var selectedTransaction = { ...defaultTransaction };
 					return 'success';
 				}
 			};
+			const getProgressWidth = (p) => {
+				if (p<=0) {
+					return 100;
+				} else if (p<=9) {
+					return 9;
+				} else {
+					return p;
+				}
+			}
+
 			let grandPercent = (grandCurrent / grandLimit) * 100;
 			const grandRemain = (grandLimit - grandCurrent);
 			$.each(enteries, function(index, entry) {
@@ -527,7 +537,7 @@ var selectedTransaction = { ...defaultTransaction };
 						    <div class="col-1">${icons[entry.category]}</div>
 						    <div class="col-11">
 						      	<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-						  			<div class="text-start progress-bar bg-${getStyleByPercent(entry.percent)}" style="width: ${entry.percent}%">
+						  			<div class="text-start progress-bar bg-${getStyleByPercent(entry.percent)}" style="width: ${getProgressWidth(entry.percent)}%">
 						  			\$${entry.remaining} of \$${entry.limit}
 						  			</div>
 								</div>
@@ -540,7 +550,7 @@ var selectedTransaction = { ...defaultTransaction };
 				    <div class="col-1">💰</div>
 				    <div class="col-11">
 				      	<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-				  			<div class="text-start progress-bar bg-${getStyleByPercent(grandPercent)}" style="width: ${(grandPercent>0) ? grandPercent : 100}%">
+				  			<div class="text-start progress-bar bg-${getStyleByPercent(grandPercent)}" style="width: ${getProgressWidth(grandPercent)}%">
 				  			\$${grandRemain} of \$${grandLimit}
 				  			</div>
 						</div>
